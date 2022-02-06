@@ -1,0 +1,41 @@
+version: "3.2"
+
+services:
+
+  contact-consumer:
+    image: 'contact-consumer'
+    build:
+      context: .
+      dockerfile: ContactConsumer/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+    ports:
+      - 10120:10120
+    network_mode: "host"
+    depends_on:
+      - rabbitmq
+      - contact-publisher
+    
+  contact-publisher:
+    image: 'contact-publisher'
+    build:
+      context: .
+      dockerfile: ContactPublisher/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+    ports:
+      - 10123:10123
+    network_mode: "host"
+    depends_on:
+      - rabbitmq
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+        - 5672:5672
+        - 15672:15672
+    environment:
+        RABBITMQ_DEFAULT_USER: "default"
+        RABBITMQ_DEFAULT_PASS: "default"
+    network_mode: "host"
